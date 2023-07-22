@@ -1,0 +1,45 @@
+{
+    "name": "op-build",
+    "displayName": "Openplanet Build Task",
+    "description": "Build Openplanet Scripts",
+    "version": "0.0.1",
+    "publisher": "skybaxrider",
+    "private": true,
+    "license": "",
+    "repository": {
+        "type": "git",
+        "url": ""
+    },
+    "engines": {
+        "vscode": "^1.73.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:workbench.action.tasks.runTask"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "taskDefinitions": [
+            {
+                "type": "op-build",
+                "required": [],
+                "properties": {}
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -b",
+        "watch": "tsc -b -w"
+    },
+    "devDependencies": {
+        "@types/node": "^16.18.34",
+        "@types/vscode": "^1.73.0",
+        "@typescript-eslint/eslint-plugin": "^5.42.0",
+        "@typescript-eslint/parser": "^5.42.0",
+        "eslint": "^8.26.0",
+        "typescript": "^5.1.0"
+    }
+}
