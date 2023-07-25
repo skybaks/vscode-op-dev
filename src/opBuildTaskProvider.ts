@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as net from 'net';
 import * as path from 'path';
+import * as fs from 'fs';
 
 interface OpBuildTaskDefinition extends vscode.TaskDefinition {
     pluginId: string;
@@ -82,16 +83,64 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
     constructor(private workspaceRoot: string, private pluginId: string, private openplanetPort: number) { }
 
     open(initialDimensions: vscode.TerminalDimensions | undefined): void {
-        this.doBuild()
-            .catch((e) => {
-                this.writeEmitter.fire('Error encountered:\r\n');
-                this.writeEmitter.fire(e.toString() + '\r\n');
-                this.closeEmitter.fire(0);
-            })
-            .then(() => {
-                this.writeEmitter.fire('Promise was returned!\r\n');
-                this.closeEmitter.fire(0);
+        const openplanetDir = path.dirname(path.dirname(this.workspaceRoot));
+        const openplanetLogPath = path.join(openplanetDir, 'Openplanet.log');
+        let logStartSize: number = -1;
+        let logEndSize: number = -1;
+
+        new Promise<void>((resolve, reject) => {
+            fs.stat(openplanetLogPath, (error, stats) => {
+                if (error) {
+                    this.writeEmitter.fire('Error encountered getting information about log file\r\n');
+                    reject();
+                } else {
+                    logStartSize = stats.size;
+                    this.writeEmitter.fire('size: ' + logStartSize.toString() + '\r\n');
+                    resolve();
+                }
             });
+        })
+        .then(() => this.doBuild())
+        .catch((e) => {
+            this.writeEmitter.fire('Error encountered:\r\n');
+            this.writeEmitter.fire(e.toString() + '\r\n');
+            this.closeEmitter.fire(0);
+        })
+        .then(() => new Promise<void>((resolve, reject) => {
+            fs.stat(openplanetLogPath, (error, stats) => {
+                if (error) {
+                    this.writeEmitter.fire('Error encountered getting info from log file (2nd time)\r\n');
+                    reject();
+                } else {
+                    logEndSize = stats.size;
+                    this.writeEmitter.fire('size: ' + logEndSize.toString() + '\r\n');
+                    resolve();
+                }
+            });
+        }))
+        .then(() => new Promise<void>((resolve, reject) => {
+            fs.open(openplanetLogPath, 'r', (error, fd) => {
+                if (error) {
+                    this.writeEmitter.fire('Error opening log file\r\n');
+                    reject();
+                } else {
+                    let buf = Buffer.alloc(logEndSize - logStartSize);
+                    fs.read(fd, buf, 0, logEndSize - logStartSize, logStartSize, (error, count, buffer) => {
+                        const logString = buffer.toString('utf8');
+                        const logLines = logString.split(/\r\n|\r|\n/);
+                        logLines.forEach((line) => {
+                            this.writeEmitter.fire(line + '\r\n');
+                        });
+                        resolve();
+                    });
+                }
+            });
+        }))
+        .then(() => {
+            this.writeEmitter.fire('Promise was returned!\r\n');
+            this.closeEmitter.fire(0);
+        });
+
     }
 
     close(): void { }
