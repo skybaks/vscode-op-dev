@@ -65,7 +65,7 @@ export class OpBuildTaskProvider implements vscode.TaskProvider {
                 openplanetPort,
             };
         }
-        return new vscode.Task(definition, vscode.TaskScope.Workspace, "Load or Reload Plugin",
+        return new vscode.Task(definition, vscode.TaskScope.Workspace, "Load/Reload from User Folder",
             OpBuildTaskProvider.OpenplanetTaskType, new vscode.CustomExecution(async (): Promise<vscode.Pseudoterminal> => {
                 return new OpBuildTaskTerminal(this.workspaceRoot, pluginId, openplanetPort);
             }));
