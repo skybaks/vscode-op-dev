@@ -9,7 +9,7 @@ interface OpBuildTaskDefinition extends vscode.TaskDefinition {
 }
 
 export class OpBuildTaskProvider implements vscode.TaskProvider {
-    static OpenplanetTaskType = 'Openplanet RemoteBuild';
+    static OpenplanetTaskType = 'Openplanet Remote Build';
     private tasks: vscode.Task[] | undefined;
 
     constructor(private workspaceRoot: string) {
