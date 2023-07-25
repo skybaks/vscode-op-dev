@@ -8,7 +8,7 @@ interface OpBuildTaskDefinition extends vscode.TaskDefinition {
 }
 
 export class OpBuildTaskProvider implements vscode.TaskProvider {
-    static OpenplanetTaskType = 'Openplanet';
+    static OpenplanetTaskType = 'Openplanet RemoteBuild';
     private tasks: vscode.Task[] | undefined;
 
     constructor(private workspaceRoot: string) {
@@ -104,7 +104,7 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
                 this.writeEmitter.fire('\terror: ' + message.error + '\r\n');
                 resolve();
             });
-            
+
             this.client.on('error', (error: Error) => {
                 this.writeEmitter.fire('Encountered an error!\r\n');
                 reject(error);

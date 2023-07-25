@@ -23,7 +23,7 @@
     "contributes": {
         "taskDefinitions": [
             {
-                "type": "Openplanet",
+                "type": "Openplanet RemoteBuild",
                 "required": [
                     "pluginId",
                     "openplanetPort"
