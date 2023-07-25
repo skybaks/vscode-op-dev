@@ -24,8 +24,20 @@
         "taskDefinitions": [
             {
                 "type": "Openplanet",
-                "required": [],
-                "properties": {}
+                "required": [
+                    "pluginId",
+                    "openplanetPort"
+                ],
+                "properties": {
+                    "pluginId": {
+                        "type": "string",
+                        "description": "The ID name of the plugin"
+                    },
+                    "openplanetPort": {
+                        "type": "number",
+                        "description": "The port which is used to communicate with Openplanet"
+                    }
+                }
             }
         ]
     },
