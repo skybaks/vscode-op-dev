@@ -83,59 +83,20 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
     constructor(private workspaceRoot: string, private pluginId: string, private openplanetPort: number) { }
 
     open(initialDimensions: vscode.TerminalDimensions | undefined): void {
-        const openplanetDir = path.dirname(path.dirname(this.workspaceRoot));
-        const openplanetLogPath = path.join(openplanetDir, 'Openplanet.log');
+        const openplanetDir: string = path.dirname(path.dirname(this.workspaceRoot));
+        const openplanetLogPath: string = path.join(openplanetDir, 'Openplanet.log');
         let logStartSize: number = -1;
         let logEndSize: number = -1;
 
-        new Promise<void>((resolve, reject) => {
-            fs.stat(openplanetLogPath, (error, stats) => {
-                if (error) {
-                    this.writeEmitter.fire('Error encountered getting information about log file\r\n');
-                    reject();
-                } else {
-                    logStartSize = stats.size;
-                    this.writeEmitter.fire('size: ' + logStartSize.toString() + '\r\n');
-                    resolve();
-                }
-            });
-        })
+        this.getLogSize(openplanetLogPath, (size: number) => logStartSize = size)
         .then(() => this.doBuild())
         .catch((e) => {
             this.writeEmitter.fire('Error encountered:\r\n');
             this.writeEmitter.fire(e.toString() + '\r\n');
             this.closeEmitter.fire(0);
         })
-        .then(() => new Promise<void>((resolve, reject) => {
-            fs.stat(openplanetLogPath, (error, stats) => {
-                if (error) {
-                    this.writeEmitter.fire('Error encountered getting info from log file (2nd time)\r\n');
-                    reject();
-                } else {
-                    logEndSize = stats.size;
-                    this.writeEmitter.fire('size: ' + logEndSize.toString() + '\r\n');
-                    resolve();
-                }
-            });
-        }))
-        .then(() => new Promise<void>((resolve, reject) => {
-            fs.open(openplanetLogPath, 'r', (error, fd) => {
-                if (error) {
-                    this.writeEmitter.fire('Error opening log file\r\n');
-                    reject();
-                } else {
-                    let buf = Buffer.alloc(logEndSize - logStartSize);
-                    fs.read(fd, buf, 0, logEndSize - logStartSize, logStartSize, (error, count, buffer) => {
-                        const logString = buffer.toString('utf8');
-                        const logLines = logString.split(/\r\n|\r|\n/);
-                        logLines.forEach((line) => {
-                            this.writeEmitter.fire(line + '\r\n');
-                        });
-                        resolve();
-                    });
-                }
-            });
-        }))
+        .then(() => this.getLogSize(openplanetLogPath, (size: number) => logEndSize = size))
+        .then(() => this.readLog(openplanetLogPath, logStartSize, logEndSize))
         .then(() => {
             this.writeEmitter.fire('Promise was returned!\r\n');
             this.closeEmitter.fire(0);
@@ -175,6 +136,41 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
                         type: 'folder'
                     }
                 }));
+            });
+        });
+    }
+
+    private async getLogSize(openplanetLogPath: string, setSize: (size: number) => void): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            fs.stat(openplanetLogPath, (error, stats) => {
+                if (error) {
+                    this.writeEmitter.fire('Error encountered getting information about log file\r\n');
+                    reject();
+                } else {
+                    setSize(stats.size);
+                    resolve();
+                }
+            });
+        });
+    }
+
+    private async readLog(openplanetLogPath: string, logStartSize: number, logEndSize: number): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            fs.open(openplanetLogPath, 'r', (error, fd) => {
+                if (error) {
+                    this.writeEmitter.fire('Error opening log file\r\n');
+                    reject();
+                } else {
+                    let buf = Buffer.alloc(logEndSize - logStartSize);
+                    fs.read(fd, buf, 0, logEndSize - logStartSize, logStartSize, (error, count, buffer) => {
+                        const logString = buffer.toString('utf8');
+                        const logLines = logString.split(/\r\n|\r|\n/);
+                        logLines.forEach((line) => {
+                            this.writeEmitter.fire(line + '\r\n');
+                        });
+                        resolve();
+                    });
+                }
             });
         });
     }
