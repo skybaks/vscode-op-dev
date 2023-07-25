@@ -40,7 +40,7 @@ export class OpBuildTaskProvider implements vscode.TaskProvider {
             }
         }
 
-        if (port !== undefined && pluginId !== undefined) {
+        if (port !== undefined) {
             this.tasks!.push(this.getTask(pluginId, port));
         }
 
