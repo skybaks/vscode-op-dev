@@ -86,18 +86,6 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
                 this.client = new net.Socket();
             }
 
-            this.client.connect(this.openplanetPort, 'localhost', () => {
-                this.writeEmitter.fire('Connected to socket\r\n');
-                this.client?.write(JSON.stringify({
-                    route: 'load_plugin',
-                    data: {
-                        id: this.pluginId,
-                        source: 'user',
-                        type: 'folder'
-                    }
-                }));
-            });
-
             this.client.on('data', (data) => {
                 const message = JSON.parse(data.slice(4).toString());
                 this.writeEmitter.fire('\tdata : ' + message.data + '\r\n');
@@ -108,6 +96,18 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
             this.client.on('error', (error: Error) => {
                 this.writeEmitter.fire('Encountered an error!\r\n');
                 reject(error);
+            });
+
+            this.client.connect(this.openplanetPort, 'localhost', () => {
+                this.writeEmitter.fire('Connected to socket\r\n');
+                this.client?.write(JSON.stringify({
+                    route: 'load_plugin',
+                    data: {
+                        id: this.pluginId,
+                        source: 'user',
+                        type: 'folder'
+                    }
+                }));
             });
         });
     }
