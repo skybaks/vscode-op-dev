@@ -10,7 +10,7 @@ export function activate(_context: vscode.ExtensionContext): void {
         return;
     }
 
-    opBuildTaskProvider = vscode.tasks.registerTaskProvider(OpBuildTaskProvider.CustomBuildScriptType, new OpBuildTaskProvider(workspaceRoot));
+    opBuildTaskProvider = vscode.tasks.registerTaskProvider(OpBuildTaskProvider.OpenplanetTaskType, new OpBuildTaskProvider(workspaceRoot));
 }
 
 export function deactivate(): void {

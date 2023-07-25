@@ -1,5 +1,5 @@
 {
-    "name": "op-build",
+    "name": "openplanet-build",
     "displayName": "Openplanet Build Task",
     "description": "Build Openplanet Scripts",
     "version": "0.0.1",
@@ -23,7 +23,7 @@
     "contributes": {
         "taskDefinitions": [
             {
-                "type": "op-build",
+                "type": "Openplanet",
                 "required": [],
                 "properties": {}
             }
