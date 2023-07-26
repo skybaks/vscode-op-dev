@@ -116,9 +116,12 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
 
             this.client.on('data', (data) => {
                 const message = JSON.parse(data.slice(4).toString());
-                this.writeEmitter.fire('\tdata : ' + message.data + '\r\n');
-                this.writeEmitter.fire('\terror: ' + message.error + '\r\n');
-                resolve();
+                if (message.error) {
+                    reject();
+                    this.writeEmitter.fire('error: ' + message.error + '\r\n');
+                } else {
+                    resolve();
+                }
             });
 
             this.client.on('error', (error: Error) => {
