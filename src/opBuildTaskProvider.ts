@@ -169,12 +169,33 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
                         const logString = buffer.toString('utf8');
                         const logLines = logString.split(/\r\n|\r|\n/);
                         logLines.forEach((line) => {
-                            this.writeEmitter.fire(line + '\r\n');
+                            this.printLogLine(line);
                         });
                         resolve();
                     });
                 }
             });
         });
+    }
+
+    private printLogLine(rawLine: string): void {
+        let getNextBrackets = (line: string, startOffset: number): [number, string] => {
+            const startIndex = line.indexOf('[', startOffset);
+            const endIndex = line.indexOf(']', startIndex);
+            return [endIndex + 1, line.slice(startIndex + 1, endIndex).trim()];
+        };
+        let index: number = 0;
+        let source: string = "";
+        let time: string = "";
+        let subject: string = "";
+        [index, source] = getNextBrackets(rawLine, 0);
+        if (rawLine.slice(index, index + 2) !== '  ') {
+            [index, time] = getNextBrackets(rawLine, index);
+            if (rawLine.slice(index, index + 2) !== '  ') {
+                [index, subject] = getNextBrackets(rawLine, index);
+            }
+        }
+        const text: string = rawLine.slice(index + 2);
+        this.writeEmitter.fire(text + '\r\n');
     }
 }
