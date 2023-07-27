@@ -69,7 +69,7 @@ export class OpBuildTaskProvider implements vscode.TaskProvider {
         return new vscode.Task(definition, vscode.TaskScope.Workspace, 'Load/Reload from User Folder',
             OpBuildTaskProvider.OpenplanetTaskType, new vscode.CustomExecution(async (): Promise<vscode.Pseudoterminal> => {
                 return new OpBuildTaskTerminal(this.workspaceRoot, pluginId, openplanetPort);
-            }), "Openplanet Remote Build Problem Matcher");
+            }), '$Openplanet Remote Build Problem Matcher: Angelscript Compiler');
     }
 }
 
@@ -91,14 +91,12 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
         this.getLogSize(openplanetLogPath, (size: number) => logStartSize = size)
         .then(() => this.doBuild())
         .catch((e) => {
-            this.writeEmitter.fire('Error encountered:\r\n');
-            this.writeEmitter.fire(e.toString() + '\r\n');
+            this.writeEmitter.fire('Error: ' + e.toString() + '\r\n');
             this.closeEmitter.fire(0);
         })
         .then(() => this.getLogSize(openplanetLogPath, (size: number) => logEndSize = size))
         .then(() => this.readLog(openplanetLogPath, logStartSize, logEndSize))
         .then(() => {
-            this.writeEmitter.fire('Promise was returned!\r\n');
             this.closeEmitter.fire(0);
         });
 
@@ -108,7 +106,6 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
 
     private async doBuild(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.writeEmitter.fire('Starting build\r\n');
 
             if (this.client === undefined) {
                 this.client = new net.Socket();
@@ -117,20 +114,17 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
             this.client.on('data', (data) => {
                 const message = JSON.parse(data.slice(4).toString());
                 if (message.error) {
-                    reject();
-                    this.writeEmitter.fire('error: ' + message.error + '\r\n');
+                    reject(message.error);
                 } else {
                     resolve();
                 }
             });
 
             this.client.on('error', (error: Error) => {
-                this.writeEmitter.fire('Encountered an error!\r\n');
                 reject(error);
             });
 
             this.client.connect(this.openplanetPort, 'localhost', () => {
-                this.writeEmitter.fire('Connected to socket\r\n');
                 this.client?.write(JSON.stringify({
                     route: 'load_plugin',
                     data: {
@@ -147,8 +141,7 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
         return new Promise<void>((resolve, reject) => {
             fs.stat(openplanetLogPath, (error, stats) => {
                 if (error) {
-                    this.writeEmitter.fire('Error encountered getting information about log file\r\n');
-                    reject();
+                    reject('Unable to access Openplanet.log');
                 } else {
                     setSize(stats.size);
                     resolve();
@@ -161,16 +154,18 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
         return new Promise<void>((resolve, reject) => {
             fs.open(openplanetLogPath, 'r', (error, fd) => {
                 if (error) {
-                    this.writeEmitter.fire('Error opening log file\r\n');
-                    reject();
+                    reject('Unable to access Openplanet.log');
                 } else {
                     let buf = Buffer.alloc(logEndSize - logStartSize);
                     fs.read(fd, buf, 0, logEndSize - logStartSize, logStartSize, (error, count, buffer) => {
                         const logString = buffer.toString('utf8');
                         const logLines = logString.split(/\r\n|\r|\n/);
-                        logLines.forEach((line) => {
-                            this.printLogLine(line);
-                        });
+                        for (let i = 0; i < logLines.length; ++i) {
+                            this.printLogLine(logLines[i]);
+                            if (logLines[i].indexOf('Loaded plugin') >= 0) {
+                                break;
+                            }
+                        }
                         resolve();
                     });
                 }

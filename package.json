@@ -23,7 +23,7 @@
     "contributes": {
         "problemMatchers": [
             {
-                "name": "Openplanet Remote Build Problem Matcher",
+                "name": "Openplanet Remote Build Problem Matcher: Angelscript Compiler",
                 "owner": "as",
                 "fileLocation": "absolute",
                 "pattern":[
