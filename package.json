@@ -21,6 +21,23 @@
     ],
     "main": "./out/extension",
     "contributes": {
+        "problemMatchers": [
+            {
+                "name": "Openplanet Remote Build Problem Matcher",
+                "owner": "as",
+                "fileLocation": "absolute",
+                "pattern":[
+                    {
+                        "regexp": "^(.*) \\((\\d+), (\\d+)\\) :\\s+(WARN|ERR) : (.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                ]
+            }
+        ],
         "taskDefinitions": [
             {
                 "type": "Openplanet Remote Build",

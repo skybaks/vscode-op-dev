@@ -69,7 +69,7 @@ export class OpBuildTaskProvider implements vscode.TaskProvider {
         return new vscode.Task(definition, vscode.TaskScope.Workspace, 'Load/Reload from User Folder',
             OpBuildTaskProvider.OpenplanetTaskType, new vscode.CustomExecution(async (): Promise<vscode.Pseudoterminal> => {
                 return new OpBuildTaskTerminal(this.workspaceRoot, pluginId, openplanetPort);
-            }));
+            }), "Openplanet Remote Build Problem Matcher");
     }
 }
 
