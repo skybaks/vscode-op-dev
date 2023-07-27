@@ -66,7 +66,7 @@ export class OpBuildTaskProvider implements vscode.TaskProvider {
                 openplanetPort,
             };
         }
-        return new vscode.Task(definition, vscode.TaskScope.Workspace, "Load/Reload from User Folder",
+        return new vscode.Task(definition, vscode.TaskScope.Workspace, 'Load/Reload from User Folder',
             OpBuildTaskProvider.OpenplanetTaskType, new vscode.CustomExecution(async (): Promise<vscode.Pseudoterminal> => {
                 return new OpBuildTaskTerminal(this.workspaceRoot, pluginId, openplanetPort);
             }));
@@ -185,9 +185,9 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
             return [endIndex + 1, line.slice(startIndex + 1, endIndex).trim()];
         };
         let index: number = 0;
-        let source: string = "";
-        let time: string = "";
-        let subject: string = "";
+        let source: string = '';
+        let time: string = '';
+        let subject: string = '';
         [index, source] = getNextBrackets(rawLine, 0);
         if (rawLine.slice(index, index + 2) !== '  ') {
             [index, time] = getNextBrackets(rawLine, index);
@@ -195,7 +195,17 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
                 [index, subject] = getNextBrackets(rawLine, index);
             }
         }
-        const text: string = rawLine.slice(index + 2);
+        const RED: string = '\x1b[31m';
+        const YELLOW: string = '\x1b[33m';
+        const CLEAR: string = '\x1b[0m';
+
+        let text: string = rawLine.slice(index + 2);
+        if (text.indexOf(':  ERR :') >= 0) {
+            text = RED + text + CLEAR;
+        } else if (text.indexOf(': WARN :') >= 0) {
+            text =  YELLOW + text + CLEAR;
+        }
+
         this.writeEmitter.fire(text + '\r\n');
     }
 }
