@@ -1,14 +1,14 @@
 {
     "name": "openplanet-build",
-    "displayName": "Openplanet Build Task",
+    "displayName": "Openplanet Remote Build Task",
     "description": "Build Openplanet Scripts",
-    "version": "0.0.1",
-    "publisher": "skybaxrider",
-    "private": true,
-    "license": "",
+    "version": "0.1.0",
+    "publisher": "skybaks",
+    "private": false,
+    "license": "MIT",
     "repository": {
         "type": "git",
-        "url": ""
+        "url": "https://github.com/skybaks/vscode-openplanet-remotebuild"
     },
     "engines": {
         "vscode": "^1.73.0"
