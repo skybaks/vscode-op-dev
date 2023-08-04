@@ -1,10 +1,12 @@
 # Openplanet Remote Build Tasks Extension
 
-This is an extension for Visual Studio Code which adds custom tasks that can compile your plugins for the
-[Openplanet](https://openplanet.dev/) extension platform for the video games Trackmania and Maniaplanet.
+This extension adds build tasks for compiling [Openplanet](https://openplanet.dev/) plugins. The tasks communicate
+with the [Remote Build](https://openplanet.dev/plugin/remotebuild) plugin to trigger script compilation and this must
+be installed for the tasks to work.
 
-[Remote Build](https://openplanet.dev/plugin/remotebuild) is a plugin for the Openplanet platform which listens for
-commands on a TCP socket and triggers plugin compilation.
+Create the simplest build task by opening the vscode workspace in your plugin directory so that the `info.toml` file is
+in the root directory.
 
-In order to perform plugin builds using this extension you will also need to have the Remote Build plugin loaded into
-Openplanet.
+If you are working out of the OpenplanetX/Plugins/\<MyPlugin\> folder then you will be presented with the "Openplanet
+Remote Build: Load/Reload from User Folder" build task. This task creates a standalone task which will run entirely
+inside the vscode extension sending commands to Openplanet and receiving feedback from the build.
