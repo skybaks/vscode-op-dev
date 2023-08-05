@@ -27,22 +27,24 @@ export class OpBuildTaskProvider implements vscode.TaskProvider {
 
         this.tasks = [];
 
-        let port: number | undefined = undefined;
-        let pluginId: string = path.basename(this.workspaceRoot);
-        const pluginsDir = path.dirname(this.workspaceRoot);
-        if (path.basename(pluginsDir) === 'Plugins') {
-            const opFolderName = path.basename(path.dirname(pluginsDir));
-            if (opFolderName === 'OpenplanetNext') {
-                port = 30000;
-            } else if (opFolderName === 'Openplanet4') {
-                port = 30001;
-            } else if (opFolderName === 'OpenplanetTurbo') {
-                port = 30002;
+        if (fs.existsSync(path.join(this.workspaceRoot, 'info.toml'))) {
+            let port: number | undefined = undefined;
+            let pluginId: string = path.basename(this.workspaceRoot);
+            const pluginsDir = path.dirname(this.workspaceRoot);
+            if (path.basename(pluginsDir) === 'Plugins') {
+                const opFolderName = path.basename(path.dirname(pluginsDir));
+                if (opFolderName === 'OpenplanetNext') {
+                    port = 30000;
+                } else if (opFolderName === 'Openplanet4') {
+                    port = 30001;
+                } else if (opFolderName === 'OpenplanetTurbo') {
+                    port = 30002;
+                }
             }
-        }
 
-        if (port !== undefined) {
-            this.tasks!.push(this.getTask(pluginId, port));
+            if (port !== undefined) {
+                this.tasks.push(this.getTask(pluginId, port));
+            }
         }
 
         return this.tasks;
