@@ -6,9 +6,13 @@
     "publisher": "skybaks",
     "private": false,
     "license": "MIT",
+    "homepage": "https://github.com/skybaks/vscode-openplanet-remotebuild/blob/master/readme.md",
     "repository": {
         "type": "git",
-        "url": "https://github.com/skybaks/vscode-openplanet-remotebuild"
+        "url": "https://github.com/skybaks/vscode-openplanet-remotebuild.git"
+    },
+    "bugs": {
+        "url": "https://github.com/skybaks/vscode-openplanet-remotebuild/issues"
     },
     "engines": {
         "vscode": "^1.73.0"
