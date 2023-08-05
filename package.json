@@ -2,7 +2,7 @@
     "name": "openplanet-build",
     "displayName": "Openplanet Remote Build Task",
     "description": "Build Openplanet Scripts",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "publisher": "skybaks",
     "private": false,
     "license": "MIT",
@@ -53,6 +53,16 @@
                     "openplanetPort": {
                         "type": "number",
                         "description": "The port which is used to communicate with Openplanet"
+                    }
+                }
+            },
+            {
+                "type": "Openplanet Remote Build Custom",
+                "required": [ "commandLine" ],
+                "properties": {
+                    "commandLine": {
+                        "type": "string",
+                        "description": "The command to be executed for the task. Should be a call to tm-remote-build or to a script which contains tm-remote-build"
                     }
                 }
             }
