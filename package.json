@@ -59,16 +59,6 @@
                         "description": "The port which is used to communicate with Openplanet"
                     }
                 }
-            },
-            {
-                "type": "Openplanet Remote Build Custom",
-                "required": [ "commandLine" ],
-                "properties": {
-                    "commandLine": {
-                        "type": "string",
-                        "description": "The command to be executed for the task. Should be a call to tm-remote-build or to a script which contains tm-remote-build"
-                    }
-                }
             }
         ]
     },
