@@ -164,7 +164,7 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
                         const logLines = logString.split(/\r\n|\r|\n/);
                         for (let i = 0; i < logLines.length; ++i) {
                             this.printLogLine(logLines[i]);
-                            if (logLines[i].indexOf('Loaded plugin') >= 0) {
+                            if (logLines[i].indexOf('[RemoteBuild]  Loaded plugin') >= 0) {
                                 break;
                             }
                         }
@@ -176,6 +176,10 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
     }
 
     private printLogLine(rawLine: string): void {
+        // Log format:
+        // [Source] [Level] [Time]  Message
+        // If the output is coming from a plugin then Message has the following format:
+        // [Plugin ID]  Message
         let getNextBrackets = (line: string, startOffset: number): [number, string] => {
             const startIndex = line.indexOf('[', startOffset);
             const endIndex = line.indexOf(']', startIndex);
@@ -183,13 +187,17 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
         };
         let index: number = 0;
         let source: string = '';
+        let level: string = '';
         let time: string = '';
         let subject: string = '';
         [index, source] = getNextBrackets(rawLine, 0);
         if (rawLine.slice(index, index + 2) !== '  ') {
-            [index, time] = getNextBrackets(rawLine, index);
+            [index, level] = getNextBrackets(rawLine, index);
             if (rawLine.slice(index, index + 2) !== '  ') {
-                [index, subject] = getNextBrackets(rawLine, index);
+                [index, time] = getNextBrackets(rawLine, index);
+                if (rawLine.slice(index, index + 2) !== '  ') {
+                    [index, subject] = getNextBrackets(rawLine, index);
+                }
             }
         }
         const RED: string = '\x1b[31m';
@@ -197,9 +205,9 @@ class OpBuildTaskTerminal implements vscode.Pseudoterminal {
         const CLEAR: string = '\x1b[0m';
 
         let text: string = rawLine.slice(index + 2);
-        if (text.indexOf(':  ERR :') >= 0) {
+        if (level === 'ERROR' || text.indexOf(':  ERR :') >= 0) {
             text = RED + text + CLEAR;
-        } else if (text.indexOf(': WARN :') >= 0) {
+        } else if (level === 'WARN' || text.indexOf(': WARN :') >= 0) {
             text =  YELLOW + text + CLEAR;
         }
 

@@ -2,7 +2,7 @@
     "name": "openplanet-build",
     "displayName": "Openplanet Remote Build Task",
     "description": "Build Openplanet Scripts",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "publisher": "skybaks",
     "private": false,
     "license": "MIT",
@@ -30,7 +30,7 @@
                 "name": "Openplanet Remote Build Problem Matcher: Angelscript Compiler",
                 "owner": "as",
                 "fileLocation": "absolute",
-                "pattern":[
+                "pattern": [
                     {
                         "regexp": "^(.*) \\((\\d+), (\\d+)\\) :\\s+(WARN|ERR) : (.*)$",
                         "file": 1,
@@ -73,6 +73,6 @@
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",
         "eslint": "^8.26.0",
-        "typescript": "^5.1.0"
+        "typescript": "^5.5.4"
     }
 }
